@@ -1,0 +1,134 @@
+CPU "8051.TBL"
+INCL "8051.INC" 
+
+PA: EQU 4000H
+PB: EQU 4001H
+PC: EQU 4002H
+PCC: EQU 4003H 
+
+UARTCWF1:       EQU 6001H
+   UART1:          EQU 6000H
+
+
+ORG 2000H
+
+MOV SP,#30H
+MOV A,#10000001B
+MOV DPTR,#4003H
+MOVX @DPTR,A
+         
+         
+        
+MAIN:   
+
+CALL SCAN    
+CALL MATCH 
+call transmit
+jmp main
+
+LJMP 0   
+  
+  
+JMP MAIN  
+
+SCAN:
+MOV A,#01110000B
+MOV DPTR,#PC
+MOVX @DPTR,A
+MOVX A,@DPTR
+ANL A,#00001111B
+JZ SCAN
+
+MOV R0,#3
+MOV R1,#00010000B
+
+SCAN_NEXT:
+MOV A,R1
+MOVX @DPTR,A
+MOVX A,@DPTR
+ANL A,#00001111B
+JZ NEXT_COL
+ORL A,R1
+
+MOV DPTR,#3300H
+MOVX @DPTR,A
+RET
+
+NEXT_COL:
+MOV A,R1
+RLC A
+MOV R1,A
+DJNZ R0,SCAN_NEXT
+JMP SCAN
+
+
+MATCH:
+MOV 51H,#0
+MOV 52H,#0
+   
+MOV DPTR,#3300H
+MOVX A,@DPTR
+
+MOV 50H,A
+ANL A,#01110000B
+SWAP A
+   
+   
+F_COL:
+RRC A
+JC ROW
+INC 51H
+JMP F_COL
+
+ROW:
+    
+MOV DPTR,#3300H
+MOVX A,@DPTR
+
+MOV 50H,A
+ANL A,#00001111B
+
+
+F_ROW:
+RRC A
+JC ROW_FND
+INC 52H
+JMP F_ROW    
+    
+ROW_FND:
+
+MOV DPTR,#KEYS
+MOV A,51H
+MOV B,#4
+MUL AB
+ADD A,52H
+
+MOVC A,@A+DPTR
+MOV DPTR,#3301H
+MOVX @DPTR,A  
+              
+   
+RET     
+
+
+;===========================================
+ TRANSMIT:
+       MOV R4,A
+       PUSH DPL
+       PUSH DPH
+       MOV DPTR,#UARTCWF1
+TRX:            MOVX A,@DPTR
+                ANL A,#10000001B
+                CJNE A,#10000001B,TRX	
+	        DEC DPL
+                MOV A,R4
+                MOVX @DPTR,A
+                POP DPH
+                POP DPL
+                MOV A,R4
+                RET
+;======================================
+
+
+KEYS:
+DFB "147*2580369#"
