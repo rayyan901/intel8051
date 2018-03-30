@@ -3,7 +3,7 @@ incl "8051.inc"
 
 RS: EQU P1_0
 RW: EQU P1_1
-EN: EQU P1_2 
+EN: EQU P1_3 
 
 
 org 2000h
@@ -12,34 +12,15 @@ mov a,#80h
 mov dptr,#4003h
 movx @dptr,a
 
-
-mov a,#38h
-call comnwrt
-call delay
-mov a,#0eh
-call comnwrt
-call delay
-mov a,#0eh
-call comnwrt
-call delay
-mov a,#01h
-call comnwrt
-call delay
-mov a,#06h
-call comnwrt
-call delay
+CALL INIT_LCD
 
 
-
-mov a,#84h
-call comnwrt
-call delay
-
-mov a,#"u"
+mov a,#"U"
 call datawrt
 call delay
 mov a,#"P"
 call datawrt
+call delay
 
 again:	sjmp again
 
@@ -68,5 +49,34 @@ delay:
 here:  mov r4,#255
 here1: djnz r4, here1
        djnz r3,here
-       ret 
+       ret  
+
+INIT_LCD:       
+mov a,#38h
+call comnwrt
+call delay
+mov a,#38h
+call comnwrt
+call delay
+mov a,#38h
+call comnwrt
+call delay
+mov a,#0eh
+call comnwrt
+call delay
+mov a,#0eh
+call comnwrt
+call delay
+mov a,#01h
+call comnwrt
+call delay
+mov a,#06h
+call comnwrt
+call delay
+mov a,#80h
+call comnwrt
+call delay
+RET       
+       
+       
 end
