@@ -1,3 +1,6 @@
+
+; lcd 4 bit mode interface, d4~d7 ==> pa4~pa7
+
 cpu "8051.tbl"
 incl "8051.inc"
 
