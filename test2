@@ -1,0 +1,24 @@
+cpu "8051.tbl"
+incl "8051.inc"
+
+org 2000h
+
+main:
+
+mov r0,#01h
+mov r1,#03h
+mov r2,#03h
+mov a,r1
+
+loop:
+
+mov a,r0
+add a,r2
+MOV R2,A
+inc r0
+djnz r1,loop
+mov dptr,#2300h
+movx @dptr,a
+ljmp 0h
+
+end
