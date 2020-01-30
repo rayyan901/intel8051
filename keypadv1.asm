@@ -31,21 +31,11 @@ CALL DISPLAY
 sjmp main
 
 scan:
-mov tenms,#10
-call delay10ms
-
-mov p1,#11110000B
-mov a,p1
-anl a,#11110000B
+CALL READROW
 cjne a,#11110000b,scan
 
 nopress:
-mov tenms,#10
-call delay10ms
-
-mov p1,#11110000B
-mov a,p1
-anl a,#11110000B
+CALL READROW
 cjne a,#11110000b,pressed
 sjmp nopress
 
@@ -68,7 +58,7 @@ KEY_FOUND:
 ANL COL,#00001111B
 ORL A,COL
 MOV keyRaw,A
-
+;===========================
 MOV DPTR,#KEYDATA
 MOV keyVal,#0
 
@@ -86,7 +76,15 @@ MOV keyVal,#16
 RET
 
 ;================
+READROW:
+mov tenms,#10
+call delay10ms
 
+mov p1,#11110000B
+mov a,p1
+anl a,#11110000B
+RET
+;============
 DISPLAY:
         MOV DPTR,#seg_data
         MOVC A,@A+DPTR // gets digit drive pattern for the current key from LUT
