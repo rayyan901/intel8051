@@ -1,0 +1,230 @@
+  
+; lcd 4 bit mode interface, d4~d7 ==> p2.0~P2.3
+
+RS EQU P2.4    ;0A4H  ;RS=P2.4
+EN EQU P2.5  ;0A6H  ;EN: EQU P2_6 	
+RW EQU P2.6 ;  or connect to gnd
+lcd_port equ P2
+
+keyVal equ 50h
+tenms  equ 51h	
+ROW    equ 52h
+keyRaw EQU 53H
+
+TEMP DATA 60H
+
+org 0000h
+     
+ljmp 0100h
+
+org 0100h
+
+mov sp,#30h     
+    
+CLR RW
+CALL INIT  
+mov a,#80h  
+call LCDCMD              
+MOV DPTR,#TEXT
+CALL DISP  
+;======
+INP:
+CALL SCAN
+MOV A,#0C7H
+CALL LCDCMD
+MOV A,KEYVAL
+ADD A,#30H
+CALL LCDDATA
+JMP INP
+
+;==============
+DISP:
+CLR A
+MOVC A,@A+DPTR
+CJNE A,#0,DIS
+RET
+DIS:
+PUSH DPH
+PUSH DPL
+CALL LCDDATA
+POP DPL
+POP DPH
+INC DPTR
+JMP DISP
+
+TEXT: DB "KEIL 89s52 LCD",0
+
+delay1ms:
+       mov r3,#2
+here:  mov r4,#255
+here1: djnz r4, here1
+       djnz r3,here
+       ret     
+;===============
+scan:
+CALL READCOL
+cjne a,#00001111b,scan
+
+nopress:
+CALL READCOL
+cjne a,#00001111b,pressed
+sjmp nopress
+
+pressed:
+mov ROW,#11101111b
+
+SCAN_KEY:
+mov p1,ROW
+mov a,p1
+anl a,#00001111b
+CJNE A,#00001111B,KEY_FOUND
+
+MOV A,ROW
+RL A
+MOV ROW,A
+CJNE A,#11111110B,SCAN_KEY
+RET
+
+KEY_FOUND:
+ANL ROW,#11110000B
+ORL A,ROW
+MOV keyRaw,A
+;===========================
+MOV DPTR,#KEYDATA
+MOV keyVal,#0
+
+FINDKEY:
+CLR A
+MOVC A,@A+DPTR
+CJNE A,keyRaw,NEXTKEY
+RET
+NEXTKEY:
+INC DPTR
+INC keyVal
+MOV A,keyVal
+CJNE A,#17, FINDKEY
+MOV keyVal,#16
+RET
+
+;================
+READCOL:
+mov tenms,#10
+call delay10ms
+
+mov p1,#00001111B
+mov a,p1
+anl a,#00001111B
+RET
+;============
+
+delay10ms:
+
+mov r7,#18          ;1 mc
+loop: mov r6,#255    ;1 mc       
+djnz r6,$            ;2 mc     2x255x18
+djnz r7, loop        ;2 mc
+djnz tenms,delay10ms         ;2 mc   need 921.66
+ret                   ; 1 mc
+;==========
+KEYDATA:
+
+DB 01111101B  ;0	
+DB 11101110B  ;1
+DB 11101101B  ;2
+DB 11101011B  ;3
+DB 11011110B  ;4
+DB 11011101B  ;5	
+DB 11011011B  ;6
+DB 10111110B  ;7
+DB 10111101B  ;8
+DB 10111011B  ;9
+DB 11100111B  ;A
+DB 11010111B  ;B	
+DB 10110111B  ;C	
+DB 01110111B  ;D	
+DB 01111011B  ;#
+DB 01111110B  ;* 
+
+;===========
+;==========
+LCDCMD:
+MOV TEMP,A
+SWAP A
+ANL A,#0FH
+ORL A,#00100000B   ;EN=1, RS =0
+MOV P2,A
+CALL delay1ms
+ANL A,#00001111B	;EN=0, RS =0
+MOV P2,A
+CALL DELAY1MS
+
+MOV A,TEMP
+ANL A,#0FH
+ORL A,#00100000B   ;EN=1, RS =0
+MOV P2,A
+CALL delay1ms
+ANL A,#00001111B	;EN=0, RS =0
+MOV P2,A
+CALL DELAY1MS
+RET
+;===============
+LCDDATA:
+MOV TEMP,A
+SWAP A
+ANL A,#0FH
+ORL A,#00110000B   ;EN=1, RS =1
+MOV P2,A
+CALL delay1ms
+ANL A,#00011111B	;EN=0, RS =1
+MOV P2,A
+CALL DELAY1MS
+
+MOV A,TEMP
+ANL A,#0FH
+ORL A,#00110000B   ;EN=1, RS =1
+MOV P2,A
+CALL delay1ms
+ANL A,#00011111B	;EN=0, RS =0
+MOV P2,A
+CALL DELAY1MS
+RET
+;========
+lcd_reset:                  ;LCD reset sequence
+	mov lcd_port, #0FFH
+	mov TENMS,#2           ;20mS delay
+	call delay10ms
+	mov lcd_port, #23H      ;Data = 30H, EN = 1, First Init
+	mov lcd_port, #03H      ;Data = 30H, EN = 0
+	mov TENMS,#2           ;20mS delay
+	call delay10ms
+	mov lcd_port, #23H      ;Second Init, Data = 30H, EN = 1
+	mov lcd_port, #03H      ;Data = 30H, EN = 0
+	mov TENMS,#1           ;10mS delay
+	call delay10ms
+	mov lcd_port, #23H      ;Third Init
+	mov lcd_port, #03H
+	mov TENMS,#1           ;10mS delay
+	call delay10ms
+	mov lcd_port, #22H      ;Select Data width (2H for 4bit)
+	mov lcd_port, #02H      ;Data = 20H, EN = 0
+	mov TENMS,#1           ;10mS delay
+	call delay10ms
+	ret
+;===========   
+INIT:
+
+mov tenms,#2
+call delay10ms
+CALL LCD_RESET
+MOV A,#28H
+CALL LCDCMD
+MOV A,#0CH
+CALL LCDCMD
+MOV A,#06H
+CALL LCDCMD
+MOV A,#01H
+CALL LCDCMD
+RET
+            
+end
+
