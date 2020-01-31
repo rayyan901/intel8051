@@ -6,8 +6,8 @@
 RS EQU P2.4    ;0A4H  ;RS=P2.4
 EN EQU P2.5  ;0A6H  ;EN: EQU P2_6 	
 RW EQU P2.6 ;  or connect to gnd
-
-
+lcd_port equ P2
+tenms  equ 51h	
 TEMP DATA 60H
 
 org 0000h
@@ -55,7 +55,7 @@ POP DPH
 INC DPTR
 JMP DISP
 
-TEXT: DB "KEIL 89s52 LCD",0
+TEXT: DB "Keil 89s52 LCD",0
 
 delay1ms:
        mov r3,#2
@@ -64,6 +64,17 @@ here1: djnz r4, here1
        djnz r3,here
        ret     
 ;===============
+
+delay10ms:
+
+mov r7,#18          ;1 mc
+loop: mov r6,#255    ;1 mc       
+djnz r6,$            ;2 mc     2x255x18
+djnz r7, loop        ;2 mc
+djnz tenms,delay10ms         ;2 mc   need 921.66
+ret                   ; 1 mc
+;==========
+;==
 LCDCMD:
 MOV TEMP,A
 SWAP A
@@ -106,7 +117,7 @@ MOV P2,A
 CALL DELAY1MS
 RET
 ;========
-  ;========
+ ;========
 lcd_reset:                  ;LCD reset sequence
 	mov lcd_port, #0FFH
 	mov TENMS,#2           ;20mS delay
@@ -145,4 +156,6 @@ CALL LCDCMD
 RET
             
 end
+
+
 
