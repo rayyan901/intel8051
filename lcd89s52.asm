@@ -106,31 +106,34 @@ MOV P2,A
 CALL DELAY1MS
 RET
 ;========
-   
+  ;========
+lcd_reset:                  ;LCD reset sequence
+	mov lcd_port, #0FFH
+	mov TENMS,#2           ;20mS delay
+	call delay10ms
+	mov lcd_port, #23H      ;Data = 30H, EN = 1, First Init
+	mov lcd_port, #03H      ;Data = 30H, EN = 0
+	mov TENMS,#2           ;20mS delay
+	call delay10ms
+	mov lcd_port, #23H      ;Second Init, Data = 30H, EN = 1
+	mov lcd_port, #03H      ;Data = 30H, EN = 0
+	mov TENMS,#1           ;10mS delay
+	call delay10ms
+	mov lcd_port, #23H      ;Third Init
+	mov lcd_port, #03H
+	mov TENMS,#1           ;10mS delay
+	call delay10ms
+	mov lcd_port, #22H      ;Select Data width (2H for 4bit)
+	mov lcd_port, #02H      ;Data = 20H, EN = 0
+	mov TENMS,#1           ;10mS delay
+	call delay10ms
+	ret
+;===========   
 INIT:
 
-CALL delay1ms
-CALL delay1ms
-
-MOV A,#02H
-MOV P2,A
-CLR RS
-
-SETB EN
-CALL delay1ms
-CLR EN
-CALL delay1ms 
-
-SETB EN
-CALL delay1ms
-CLR EN
-CALL delay1ms
-
-SETB EN
-CALL delay1ms
-CLR EN
-CALL delay1ms
-
+mov tenms,#2
+call delay10ms
+CALL LCD_RESET
 MOV A,#28H
 CALL LCDCMD
 MOV A,#0CH
