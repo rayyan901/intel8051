@@ -116,7 +116,6 @@ lcd_reset:                  ;LCD reset sequence
 ;==
 LCDCMD:
 MOV TEMP,A
-;SWAP A
 ANL A,#0F0H
 ORL A,#00001100B   ;EN=1, RS =0...bl,en,rw,rs
 call send
@@ -139,7 +138,6 @@ RET
 ;===============
 LCDDATA:
 MOV TEMP,A
-;SWAP A
 ANL A,#0F0H
 ORL A,#00001101B   ;EN=1, RS =1
 call send ;MOV P2,A
