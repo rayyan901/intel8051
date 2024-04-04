@@ -19,13 +19,14 @@ org 100h
 
 mov sp,#30h
 mov slave_add,#4Eh
+call lcd_init	
 jmp main
 text1: DB "Microp I EEE226",0
 
 
 main:
 
-call lcd_init		
+	
 mov a,#80h
 call lcd_send_cmd
 mov a,#'A'
