@@ -19,6 +19,9 @@ org 100h
 
 mov sp,#30h
 mov slave_add,#4Eh
+jmp main
+text1: DB "Microp I EEE226",0
+
 
 main:
 
@@ -29,13 +32,13 @@ mov a,#'A'
 call lcd_send_data
 mov a,#'b'
 call lcd_send_data
-mov a,#'C'
+mov a,#'c'
 call lcd_send_data
 
 mov a,#0C0h
 call lcd_send_cmd
 
-text1: DB "Hello",0
+
 mov dptr,#text1
 call dispString
 
