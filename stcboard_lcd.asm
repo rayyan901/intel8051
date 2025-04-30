@@ -84,11 +84,9 @@ LCDCMD:
 MOV TEMP,A
 ANL A,#0F0H
 ORL A,#00000100B   ; RS=0 EN=1
-;MOV P2,A
 call sendLcd
 CALL delay1ms
 ANL A,#0F0H	        ; RS=0 EN=0
-;MOV P2,A
 call sendLcd
 CALL DELAY1MS
 
@@ -96,11 +94,9 @@ MOV A,TEMP
 SWAP A
 ANL A,#0F0H
 ORL A,#00000100B   ;RS=0 EN=1
-;MOV P2,A
 call sendLcd
 CALL delay1ms
 ANL A,#0F0H	       ;RS=0 EN=0
-;MOV P2,A
 call sendLcd
 CALL DELAY1MS
 RET
@@ -109,11 +105,9 @@ LCDDATA:
 MOV TEMP,A
 ANL A,#0F0H
 ORL A,#00001100B   ; RS=1 EN=1
-;MOV P2,A
 CALL sendLcd
 CALL delay1ms
 ANL A,#11111000B	; RS=1 EN=0
-;MOV P2,A
 call sendLcd
 CALL DELAY1MS
 
@@ -121,11 +115,9 @@ MOV A,TEMP
 SWAP A
 ANL A,#0F0H
 ORL A,#00001100B   ;RS=1 EN=1
-;MOV P2,A
 call sendLcd
 CALL delay1ms
 ANL A,#11111000B	;RS=1 EN=0
-;MOV P2,A
 call sendLcd
 CALL DELAY1MS
 RET
