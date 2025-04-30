@@ -9,9 +9,6 @@ RS bit P2.0    ;RS=P2.3
 RW bit P2.1 ;  or connect to gnd
 EN bit P2.2    ;EN=P2_2	
 
-
-
-lcd_port equ P2
 tenms  equ 51h	
 msten  equ 50h
 TEMP DATA 60H
