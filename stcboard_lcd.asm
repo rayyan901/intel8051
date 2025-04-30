@@ -1,13 +1,13 @@
   
-; lcd 4 bit mode interface, d4~d7 ==> p2.4~P2.7
+; lcd 4 bit mode interface, d4~d7 ==> p0.4~P0.7
 d7 bit p0.7
 d6 bit p0.6
 d5 bit p0.5
 d4 bit p0.4
 
-RS bit P2.0    ;RS=P2.3
-RW bit P2.1 ;  or connect to gnd
-EN bit P2.2    ;EN=P2_2	
+RS bit P2.0    ;RS=P2.0
+RW bit P2.1    ;RW=P2.1  or connect to gnd
+EN bit P2.2    ;EN=P2.2	
 
 tenms  equ 51h	
 msten  equ 50h
