@@ -1,5 +1,9 @@
 org 0000h
-     
+; RD ----- P0.5
+; WR ----- P0.6
+; INTR --- P0.7
+; D0~D7 -- P2.0~P2.7
+
 ljmp main
 
 org 0100h
