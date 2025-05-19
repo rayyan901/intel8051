@@ -1,4 +1,12 @@
-
+; keypad connection
+; p2.0 ---> col 1
+; p2.1 ---> col 2
+; p2.2 ---> col 3
+; p2.3 ---> col 4
+; p2.4 ---> row 1
+; p2.5 ---> row 2
+; p2.6 ---> row 3
+; p2.7 ---> row 4
 ORG 0H
 	LJMP MAIN
 
